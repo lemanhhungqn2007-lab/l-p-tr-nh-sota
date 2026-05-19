@@ -1,375 +1,672 @@
-This is a complete HTML document that creates a realistic, interactive 3D ATM card design you can view directly in your browser.
 <!DOCTYPE html>
 <html lang="vi">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
-  <title>Thẻ ATM 3D | Thiết kế hiện đại</title>
-  <style>
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-    }
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>Thẻ ATM 3D | Lật mặt trước/sau</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
 
-    body {
-      background: linear-gradient(145deg, #1a1e2b 0%, #2a2f3f 100%);
-      min-height: 100vh;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      font-family: 'Segoe UI', 'Inter', system-ui, -apple-system, sans-serif;
-      padding: 20px;
-      margin: 0;
-    }
+        body {
+            background: linear-gradient(145deg, #1a1e2b 0%, #2a2f3f 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-family: 'Segoe UI', 'Inter', system-ui, -apple-system, sans-serif;
+            padding: 20px;
+            margin: 0;
+            flex-direction: column;
+        }
 
-    /* Hiệu ứng nền động nhẹ */
-    .background-glow {
-      position: fixed;
-      width: 600px;
-      height: 600px;
-      background: radial-gradient(circle, rgba(99, 102, 241, 0.25) 0%, transparent 70%);
-      top: -100px;
-      right: -100px;
-      border-radius: 50%;
-      filter: blur(60px);
-      z-index: 0;
-      pointer-events: none;
-    }
+        .background-glow {
+            position: fixed;
+            width: 600px;
+            height: 600px;
+            background: radial-gradient(circle, rgba(99, 102, 241, 0.25) 0%, transparent 70%);
+            top: -100px;
+            right: -100px;
+            border-radius: 50%;
+            filter: blur(60px);
+            z-index: 0;
+            pointer-events: none;
+        }
 
-    .card-container {
-      perspective: 1200px;
-      width: 460px;
-      max-width: 100%;
-      height: 280px;
-      position: relative;
-      z-index: 2;
-    }
+        .background-glow-2 {
+            position: fixed;
+            width: 500px;
+            height: 500px;
+            background: radial-gradient(circle, rgba(251, 191, 36, 0.18) 0%, transparent 70%);
+            bottom: -120px;
+            left: -80px;
+            border-radius: 50%;
+            filter: blur(60px);
+            z-index: 0;
+            pointer-events: none;
+        }
 
-    /* Thẻ chính */
-    .atm-card {
-      width: 100%;
-      height: 100%;
-      position: relative;
-      transform-style: preserve-3d;
-      transition: transform 0.6s cubic-bezier(0.23, 1, 0.32, 1);
-      border-radius: 20px;
-      box-shadow: 0 30px 50px rgba(0, 0, 0, 0.6), 0 10px 25px rgba(0, 0, 0, 0.5);
-    }
+        .card-wrapper {
+            position: relative;
+            z-index: 2;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 20px;
+        }
 
-    /* Hiệu ứng lật khi hover (tùy chọn) */
-    .card-container:hover .atm-card {
-      transform: rotateY(8deg) rotateX(5deg);
-    }
+        .card-container {
+            perspective: 1200px;
+            width: 460px;
+            max-width: 100%;
+            height: 280px;
+            cursor: pointer;
+            -webkit-tap-highlight-color: transparent;
+            user-select: none;
+        }
 
-    /* Mặt trước thẻ */
-    .card-front {
-      position: absolute;
-      width: 100%;
-      height: 100%;
-      backface-visibility: hidden;
-      border-radius: 20px;
-      background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
-      background-image: 
-        radial-gradient(circle at 20% 30%, rgba(255, 255, 255, 0.08) 0%, transparent 40%),
-        linear-gradient(160deg, #2d3748 0%, #1a202c 70%, #0b0f19 100%);
-      padding: 28px 30px;
-      display: flex;
-      flex-direction: column;
-      justify-content: space-between;
-      color: #e2e8f0;
-      border: 1px solid rgba(255, 255, 255, 0.1);
-      box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.1);
-      overflow: hidden;
-    }
+        /* Thẻ chính - container flip */
+        .atm-card {
+            width: 100%;
+            height: 100%;
+            position: relative;
+            transform-style: preserve-3d;
+            transition: transform 0.7s cubic-bezier(0.4, 0.0, 0.2, 1);
+            border-radius: 20px;
+        }
 
-    /* Họa tiết nền bổ sung */
-    .card-front::before {
-      content: "";
-      position: absolute;
-      top: -50px;
-      right: -50px;
-      width: 280px;
-      height: 280px;
-      background: radial-gradient(circle, rgba(255, 215, 0, 0.15) 0%, transparent 70%);
-      border-radius: 50%;
-      z-index: 0;
-    }
+        /* Trạng thái lật */
+        .atm-card.flipped {
+            transform: rotateY(180deg);
+        }
 
-    .card-front::after {
-      content: "";
-      position: absolute;
-      bottom: -60px;
-      left: -40px;
-      width: 240px;
-      height: 240px;
-      background: radial-gradient(circle, rgba(59, 130, 246, 0.2) 0%, transparent 70%);
-      border-radius: 50%;
-      z-index: 0;
-    }
+        /* Hiệu ứng nâng nhẹ khi hover (chỉ khi chưa lật) */
+        .card-container:hover .atm-card:not(.flipped) {
+            transform: rotateY(5deg) rotateX(3deg);
+        }
+        .card-container:hover .atm-card.flipped {
+            transform: rotateY(175deg) rotateX(-3deg);
+        }
 
-    /* Các phần tử bên trong xếp trên nền */
-    .card-header, .card-body, .card-footer {
-      position: relative;
-      z-index: 2;
-    }
+        /* ===== MẶT TRƯỚC ===== */
+        .card-front {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            backface-visibility: hidden;
+            -webkit-backface-visibility: hidden;
+            border-radius: 20px;
+            background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
+            background-image:
+                radial-gradient(circle at 20% 30%, rgba(255, 255, 255, 0.08) 0%, transparent 40%),
+                linear-gradient(160deg, #2d3748 0%, #1a202c 70%, #0b0f19 100%);
+            padding: 28px 30px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            color: #e2e8f0;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            box-shadow: 0 30px 50px rgba(0, 0, 0, 0.6), 0 10px 25px rgba(0, 0, 0, 0.5),
+                inset 0 1px 0 rgba(255, 255, 255, 0.1);
+            overflow: hidden;
+            z-index: 2;
+        }
 
-    .card-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-    }
+        .card-front::before {
+            content: "";
+            position: absolute;
+            top: -50px;
+            right: -50px;
+            width: 280px;
+            height: 280px;
+            background: radial-gradient(circle, rgba(255, 215, 0, 0.15) 0%, transparent 70%);
+            border-radius: 50%;
+            z-index: 0;
+        }
 
-    .bank-logo {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-    }
+        .card-front::after {
+            content: "";
+            position: absolute;
+            bottom: -60px;
+            left: -40px;
+            width: 240px;
+            height: 240px;
+            background: radial-gradient(circle, rgba(59, 130, 246, 0.2) 0%, transparent 70%);
+            border-radius: 50%;
+            z-index: 0;
+        }
 
-    .logo-icon {
-      width: 42px;
-      height: 42px;
-      background: linear-gradient(135deg, #fbbf24, #f59e0b);
-      border-radius: 12px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-weight: 700;
-      font-size: 20px;
-      color: #0f172a;
-      box-shadow: 0 8px 15px rgba(251, 191, 36, 0.3);
-    }
+        .card-header,
+        .card-body,
+        .card-footer {
+            position: relative;
+            z-index: 2;
+        }
 
-    .bank-name {
-      font-weight: 600;
-      font-size: 1.2rem;
-      letter-spacing: 0.5px;
-      color: #f1f5f9;
-    }
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
 
-    .card-type {
-      font-weight: 600;
-      font-size: 0.9rem;
-      background: rgba(255, 255, 255, 0.1);
-      backdrop-filter: blur(10px);
-      padding: 5px 14px;
-      border-radius: 30px;
-      color: #facc15;
-      letter-spacing: 0.8px;
-      border: 1px solid rgba(250, 204, 21, 0.3);
-    }
+        .bank-logo {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
 
-    .chip-section {
-      display: flex;
-      align-items: center;
-      gap: 15px;
-      margin: 10px 0 5px;
-    }
+        .logo-icon {
+            width: 42px;
+            height: 42px;
+            background: linear-gradient(135deg, #fbbf24, #f59e0b);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 20px;
+            color: #0f172a;
+            box-shadow: 0 8px 15px rgba(251, 191, 36, 0.3);
+        }
 
-    .chip {
-      width: 50px;
-      height: 38px;
-      background: linear-gradient(145deg, #d4af37, #b7932a);
-      border-radius: 8px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      box-shadow: 0 4px 10px rgba(0,0,0,0.5), inset 0 1px 2px rgba(255,255,200,0.6);
-      position: relative;
-    }
+        .bank-name {
+            font-weight: 600;
+            font-size: 1.2rem;
+            letter-spacing: 0.5px;
+            color: #f1f5f9;
+        }
 
-    .chip::after {
-      content: "";
-      width: 32px;
-      height: 24px;
-      background: repeating-linear-gradient(90deg, #a68b1c 0px, #a68b1c 3px, #e4c45a 3px, #e4c45a 6px);
-      border-radius: 3px;
-    }
+        .card-type {
+            font-weight: 600;
+            font-size: 0.9rem;
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            padding: 5px 14px;
+            border-radius: 30px;
+            color: #facc15;
+            letter-spacing: 0.8px;
+            border: 1px solid rgba(250, 204, 21, 0.3);
+        }
 
-    .contactless-icon {
-      font-size: 24px;
-      color: #94a3b8;
-      transform: rotate(90deg);
-      opacity: 0.8;
-    }
+        .chip-section {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin: 10px 0 5px;
+        }
 
-    .card-number {
-      font-family: 'Courier New', 'Fira Code', monospace;
-      font-size: 1.9rem;
-      font-weight: 500;
-      letter-spacing: 4px;
-      word-spacing: 10px;
-      color: #f8fafc;
-      text-shadow: 0 2px 5px rgba(0,0,0,0.5);
-      margin: 5px 0 2px;
-      display: flex;
-      justify-content: space-between;
-    }
+        .chip {
+            width: 50px;
+            height: 38px;
+            background: linear-gradient(145deg, #d4af37, #b7932a);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.5), inset 0 1px 2px rgba(255, 255, 200, 0.6);
+            position: relative;
+        }
 
-    .card-footer {
-      display: flex;
-      justify-content: space-between;
-      align-items: flex-end;
-      margin-top: 5px;
-    }
+        .chip::after {
+            content: "";
+            width: 32px;
+            height: 24px;
+            background: repeating-linear-gradient(90deg,
+                    #a68b1c 0px, #a68b1c 3px,
+                    #e4c45a 3px, #e4c45a 6px);
+            border-radius: 3px;
+        }
 
-    .holder-info {
-      display: flex;
-      flex-direction: column;
-    }
+        .contactless-icon {
+            font-size: 24px;
+            color: #94a3b8;
+            transform: rotate(90deg);
+            opacity: 0.8;
+        }
 
-    .label {
-      font-size: 0.65rem;
-      text-transform: uppercase;
-      letter-spacing: 1.5px;
-      color: #94a3b8;
-      font-weight: 500;
-    }
+        .card-number {
+            font-family: 'Courier New', 'Fira Code', monospace;
+            font-size: 1.9rem;
+            font-weight: 500;
+            letter-spacing: 4px;
+            word-spacing: 10px;
+            color: #f8fafc;
+            text-shadow: 0 2px 5px rgba(0, 0, 0, 0.5);
+            margin: 5px 0 2px;
+            display: flex;
+            justify-content: space-between;
+        }
 
-    .value {
-      font-weight: 600;
-      font-size: 1.1rem;
-      letter-spacing: 0.6px;
-      color: #e2e8f0;
-      text-transform: uppercase;
-    }
+        .card-footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end;
+            margin-top: 5px;
+        }
 
-    .expiry-cvv {
-      display: flex;
-      gap: 25px;
-      align-items: flex-end;
-    }
+        .holder-info {
+            display: flex;
+            flex-direction: column;
+        }
 
-    .network-logo {
-      display: flex;
-      align-items: center;
-      gap: 5px;
-    }
+        .label {
+            font-size: 0.65rem;
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            color: #94a3b8;
+            font-weight: 500;
+        }
 
-    .circle-red {
-      width: 28px;
-      height: 28px;
-      background: #ef4444;
-      border-radius: 50%;
-      opacity: 0.9;
-    }
+        .value {
+            font-weight: 600;
+            font-size: 1.1rem;
+            letter-spacing: 0.6px;
+            color: #e2e8f0;
+            text-transform: uppercase;
+        }
 
-    .circle-yellow {
-      width: 28px;
-      height: 28px;
-      background: #f59e0b;
-      border-radius: 50%;
-      margin-left: -12px;
-      opacity: 0.9;
-    }
+        .expiry-cvv {
+            display: flex;
+            gap: 25px;
+            align-items: flex-end;
+        }
 
-    .network-text {
-      font-weight: 700;
-      font-size: 1.3rem;
-      letter-spacing: 1px;
-      margin-left: 5px;
-      color: #cbd5e1;
-    }
+        .network-logo {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
 
-    /* Hiệu ứng ánh sáng quét */
-    .shine {
-      position: absolute;
-      top: 0;
-      left: -100%;
-      width: 60%;
-      height: 100%;
-      background: linear-gradient(90deg, transparent, rgba(255,255,255,0.12), transparent);
-      transform: skewX(-20deg);
-      transition: left 0.8s ease;
-      z-index: 5;
-      pointer-events: none;
-    }
+        .circle-red {
+            width: 28px;
+            height: 28px;
+            background: #ef4444;
+            border-radius: 50%;
+            opacity: 0.9;
+        }
 
-    .card-container:hover .shine {
-      left: 120%;
-    }
+        .circle-yellow {
+            width: 28px;
+            height: 28px;
+            background: #f59e0b;
+            border-radius: 50%;
+            margin-left: -12px;
+            opacity: 0.9;
+        }
 
-    /* Thông tin bổ sung bên ngoài */
-    .card-description {
-      text-align: center;
-      margin-top: 25px;
-      color: #9ca3af;
-      font-size: 0.9rem;
-      font-weight: 400;
-      letter-spacing: 0.4px;
-      z-index: 2;
-      position: relative;
-    }
+        .network-text {
+            font-weight: 700;
+            font-size: 1.3rem;
+            letter-spacing: 1px;
+            margin-left: 5px;
+            color: #cbd5e1;
+        }
 
-    @media (max-width: 480px) {
-      .card-container {
-        width: 100%;
-        height: 250px;
-      }
-      .card-front {
-        padding: 20px 22px;
-      }
-      .card-number {
-        font-size: 1.5rem;
-        letter-spacing: 3px;
-      }
-    }
-  </style>
+        /* Ánh sáng quét */
+        .shine {
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 60%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.1), transparent);
+            transform: skewX(-20deg);
+            transition: left 1s ease;
+            z-index: 5;
+            pointer-events: none;
+        }
+
+        .card-container:hover .shine {
+            left: 130%;
+        }
+
+        /* ===== MẶT SAU ===== */
+        .card-back {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            backface-visibility: hidden;
+            -webkit-backface-visibility: hidden;
+            border-radius: 20px;
+            background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
+            background-image:
+                radial-gradient(circle at 70% 60%, rgba(255, 255, 255, 0.05) 0%, transparent 50%),
+                linear-gradient(160deg, #2d3748 0%, #1a202c 70%, #0b0f19 100%);
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            color: #e2e8f0;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            box-shadow: 0 30px 50px rgba(0, 0, 0, 0.6), 0 10px 25px rgba(0, 0, 0, 0.5),
+                inset 0 1px 0 rgba(255, 255, 255, 0.1);
+            overflow: hidden;
+            transform: rotateY(180deg);
+            z-index: 1;
+        }
+
+        /* Dải từ đen */
+        .magnetic-stripe {
+            width: 100%;
+            height: 48px;
+            background: linear-gradient(180deg, #1a1a1a 0%, #0d0d0d 30%, #1f1f1f 60%, #0a0a0a 100%);
+            margin-top: 28px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.5);
+        }
+
+        .back-content {
+            padding: 20px 28px 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            flex: 1;
+            position: relative;
+            z-index: 2;
+        }
+
+        /* Khu vực chữ ký */
+        .signature-section {
+            display: flex;
+            align-items: stretch;
+            gap: 0;
+            height: 40px;
+            margin-top: 5px;
+        }
+
+        .signature-label {
+            font-size: 0.6rem;
+            text-transform: uppercase;
+            letter-spacing: 1.2px;
+            color: #94a3b8;
+            font-weight: 500;
+            writing-mode: vertical-rl;
+            text-orientation: mixed;
+            background: rgba(255, 255, 255, 0.03);
+            padding: 4px 6px;
+            border-radius: 4px 0 0 4px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-right: none;
+        }
+
+        .signature-strip {
+            flex: 1;
+            background: repeating-linear-gradient(-45deg,
+                    #e8e4d8 0px, #e8e4d8 2px,
+                    #f5f2e8 2px, #f5f2e8 4px);
+            border-radius: 0 4px 4px 0;
+            border: 1px solid rgba(180, 170, 150, 0.6);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .signature-strip::after {
+            content: "Signature";
+            position: absolute;
+            right: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            font-family: 'Brush Script MT', 'Dancing Script', cursive;
+            font-size: 1.5rem;
+            color: rgba(80, 70, 60, 0.4);
+            letter-spacing: 2px;
+            pointer-events: none;
+        }
+
+        /* Dãy CVV */
+        .cvv-section {
+            display: flex;
+            align-items: center;
+            justify-content: flex-end;
+            gap: 12px;
+            margin-top: 2px;
+        }
+
+        .cvv-label {
+            font-size: 0.65rem;
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            color: #94a3b8;
+            font-weight: 500;
+        }
+
+        .cvv-box {
+            background: #f8fafc;
+            color: #0f172a;
+            font-family: 'Courier New', monospace;
+            font-weight: 700;
+            font-size: 1.1rem;
+            letter-spacing: 3px;
+            padding: 8px 18px;
+            border-radius: 6px;
+            box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.2);
+            min-width: 80px;
+            text-align: center;
+        }
+
+        /* Thông tin ngân hàng mặt sau */
+        .back-bank-info {
+            margin-top: auto;
+            font-size: 0.7rem;
+            color: #94a3b8;
+            line-height: 1.5;
+            letter-spacing: 0.3px;
+            border-top: 1px solid rgba(255, 255, 255, 0.08);
+            padding-top: 12px;
+        }
+
+        .back-bank-info strong {
+            color: #cbd5e1;
+            font-weight: 600;
+        }
+
+        .back-network {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            margin-top: 6px;
+        }
+
+        .back-network .circle-red {
+            width: 22px;
+            height: 22px;
+        }
+        .back-network .circle-yellow {
+            width: 22px;
+            height: 22px;
+            margin-left: -10px;
+        }
+        .back-network span {
+            font-weight: 700;
+            font-size: 1rem;
+            letter-spacing: 1px;
+            color: #cbd5e1;
+        }
+
+        /* Nút gợi ý bên dưới */
+        .hint-text {
+            color: #9ca3af;
+            font-size: 0.9rem;
+            font-weight: 400;
+            letter-spacing: 0.4px;
+            text-align: center;
+            z-index: 2;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: color 0.3s;
+        }
+
+        .hint-icon {
+            display: inline-block;
+            transition: transform 0.4s ease;
+            font-size: 1.1rem;
+        }
+
+        .card-container:hover~.hint-text .hint-icon,
+        .card-wrapper:hover .hint-text .hint-icon {
+            transform: rotateY(180deg);
+        }
+
+        /* Responsive */
+        @media (max-width: 480px) {
+            .card-container {
+                width: 100%;
+                height: 250px;
+            }
+            .card-front {
+                padding: 20px 22px;
+            }
+            .card-number {
+                font-size: 1.5rem;
+                letter-spacing: 3px;
+            }
+            .back-content {
+                padding: 12px 18px 14px;
+            }
+            .magnetic-stripe {
+                height: 40px;
+                margin-top: 22px;
+            }
+            .signature-section {
+                height: 34px;
+            }
+            .cvv-box {
+                padding: 6px 14px;
+                font-size: 1rem;
+            }
+        }
+    </style>
 </head>
 <body>
-  <div class="background-glow"></div>
-  
-  <div style="display: flex; flex-direction: column; align-items: center; width: 100%;">
-    <div class="card-container">
-      <div class="atm-card">
-        <!-- Mặt trước thẻ ATM -->
-        <div class="card-front">
-          <div class="shine"></div>
-          
-          <div class="card-header">
-            <div class="bank-logo">
-              <div class="logo-icon">V</div>
-              <span class="bank-name">VIBANK</span>
-            </div>
-            <div class="card-type">PLATINUM</div>
-          </div>
+    <div class="background-glow"></div>
+    <div class="background-glow-2"></div>
 
-          <div class="card-body">
-            <div class="chip-section">
-              <div class="chip"></div>
-              <span class="contactless-icon">📶</span>
-            </div>
-            <div class="card-number">
-              <span>4856</span>
-              <span>9210</span>
-              <span>3782</span>
-              <span>1045</span>
-            </div>
-          </div>
+    <div class="card-wrapper">
+        <!-- Container thẻ -->
+        <div class="card-container" id="cardContainer" title="Nhấn để lật thẻ">
+            <div class="atm-card" id="atmCard">
+                <!-- ========== MẶT TRƯỚC ========== -->
+                <div class="card-front">
+                    <div class="shine"></div>
 
-          <div class="card-footer">
-            <div class="holder-info">
-              <span class="label">Chủ thẻ</span>
-              <span class="value">NGUYEN VAN A</span>
+                    <div class="card-header">
+                        <div class="bank-logo">
+                            <div class="logo-icon">V</div>
+                            <span class="bank-name">VIBANK</span>
+                        </div>
+                        <div class="card-type">PLATINUM</div>
+                    </div>
+
+                    <div class="card-body">
+                        <div class="chip-section">
+                            <div class="chip"></div>
+                            <span class="contactless-icon">📶</span>
+                        </div>
+                        <div class="card-number">
+                            <span>4856</span>
+                            <span>9210</span>
+                            <span>3782</span>
+                            <span>1045</span>
+                        </div>
+                    </div>
+
+                    <div class="card-footer">
+                        <div class="holder-info">
+                            <span class="label">Chủ thẻ</span>
+                            <span class="value">NGUYEN VAN A</span>
+                        </div>
+                        <div class="expiry-cvv">
+                            <div>
+                                <span class="label">Hiệu lực</span>
+                                <span class="value">12/28</span>
+                            </div>
+                        </div>
+                        <div class="network-logo">
+                            <div class="circle-red"></div>
+                            <div class="circle-yellow"></div>
+                            <span class="network-text">Mastercard</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- ========== MẶT SAU ========== -->
+                <div class="card-back">
+                    <!-- Dải từ tính -->
+                    <div class="magnetic-stripe"></div>
+
+                    <div class="back-content">
+                        <!-- Dòng chữ ký -->
+                        <div class="signature-section">
+                            <div class="signature-label">Ký</div>
+                            <div class="signature-strip"></div>
+                        </div>
+
+                        <!-- Mã CVV -->
+                        <div class="cvv-section">
+                            <span class="cvv-label">CVV</span>
+                            <div class="cvv-box">•••</div>
+                        </div>
+
+                        <!-- Thông tin ngân hàng -->
+                        <div class="back-bank-info">
+                            <strong>VIBANK</strong> - Ngân hàng TMCP Quốc Tế Việt Nam<br>
+                            Hotline: 1900 9999 88 • www.vibank.vn<br>
+                            Thẻ này thuộc quyền sở hữu của VIBANK.
+                            Nếu nhặt được, vui lòng trả lại ngân hàng gần nhất.
+                            <div class="back-network">
+                                <div class="circle-red"></div>
+                                <div class="circle-yellow"></div>
+                                <span>Mastercard</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
-            <div class="expiry-cvv">
-              <div>
-                <span class="label">Hiệu lực</span>
-                <span class="value">12/28</span>
-              </div>
-            </div>
-            <div class="network-logo">
-              <div class="circle-red"></div>
-              <div class="circle-yellow"></div>
-              <span class="network-text">Mastercard</span>
-            </div>
-          </div>
         </div>
-      </div>
+
+        <!-- Dòng gợi ý -->
+        <div class="hint-text">
+            <span class="hint-icon">👆</span> Nhấn vào thẻ để lật mặt sau
+        </div>
     </div>
-    <div class="card-description">
-      ✦ Thẻ ATM • Thiết kế 3D tương tác ✦
-    </div>
-  </div>
+
+    <script>
+        (function() {
+            const cardContainer = document.getElementById('cardContainer');
+            const atmCard = document.getElementById('atmCard');
+            const hintText = document.querySelector('.hint-text');
+
+            let isFlipped = false;
+
+            cardContainer.addEventListener('click', function(e) {
+                // Ngăn chặn click lan ra ngoài
+                e.stopPropagation();
+
+                isFlipped = !isFlipped;
+
+                if (isFlipped) {
+                    atmCard.classList.add('flipped');
+                    hintText.innerHTML =
+                        '<span class="hint-icon">👆</span> Nhấn vào thẻ để lật mặt trước';
+                } else {
+                    atmCard.classList.remove('flipped');
+                    hintText.innerHTML =
+                        '<span class="hint-icon">👆</span> Nhấn vào thẻ để lật mặt sau';
+                }
+            });
+
+            // Hỗ trợ touch trên mobile
+            cardContainer.addEventListener('touchstart', function(e) {
+                // Không preventDefault để vẫn giữ scroll nếu cần
+                // Chỉ đánh dấu để tránh double-fire với click
+            }, { passive: true });
+        })();
+    </script>
 </body>
 </html>
+
