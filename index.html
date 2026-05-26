@@ -2,8 +2,8 @@
 <html lang="vi">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
-    <title>Thẻ ATM 3D | Lật mặt trước/sau</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Shop Bán Hàng</title>
     <style>
         * {
             margin: 0;
@@ -12,661 +12,889 @@
         }
 
         body {
-            background: linear-gradient(145deg, #1a1e2b 0%, #2a2f3f 100%);
-            min-height: 100vh;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f5f5f5;
+            color: #333;
+        }
+
+        header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 1rem 2rem;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+
+        .header-content {
+            max-width: 1200px;
+            margin: 0 auto;
             display: flex;
-            justify-content: center;
+            justify-content: space-between;
             align-items: center;
-            font-family: 'Segoe UI', 'Inter', system-ui, -apple-system, sans-serif;
-            padding: 20px;
-            margin: 0;
-            flex-direction: column;
         }
 
-        .background-glow {
-            position: fixed;
-            width: 600px;
-            height: 600px;
-            background: radial-gradient(circle, rgba(99, 102, 241, 0.25) 0%, transparent 70%);
-            top: -100px;
-            right: -100px;
-            border-radius: 50%;
-            filter: blur(60px);
-            z-index: 0;
-            pointer-events: none;
+        .logo {
+            font-size: 1.8rem;
+            font-weight: bold;
         }
 
-        .background-glow-2 {
-            position: fixed;
-            width: 500px;
-            height: 500px;
-            background: radial-gradient(circle, rgba(251, 191, 36, 0.18) 0%, transparent 70%);
-            bottom: -120px;
-            left: -80px;
-            border-radius: 50%;
-            filter: blur(60px);
-            z-index: 0;
-            pointer-events: none;
-        }
-
-        .card-wrapper {
-            position: relative;
-            z-index: 2;
+        .nav-buttons {
             display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 20px;
+            gap: 1rem;
         }
 
-        .card-container {
-            perspective: 1200px;
-            width: 460px;
-            max-width: 100%;
-            height: 280px;
+        button {
+            padding: 0.7rem 1.5rem;
+            border: none;
+            border-radius: 5px;
             cursor: pointer;
-            -webkit-tap-highlight-color: transparent;
-            user-select: none;
+            font-size: 1rem;
+            transition: all 0.3s ease;
         }
 
-        /* Thẻ chính - container flip */
-        .atm-card {
-            width: 100%;
-            height: 100%;
+        .btn-primary {
+            background-color: #fff;
+            color: #667eea;
+            font-weight: bold;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        }
+
+        .cart-icon {
             position: relative;
-            transform-style: preserve-3d;
-            transition: transform 0.7s cubic-bezier(0.4, 0.0, 0.2, 1);
-            border-radius: 20px;
+            font-size: 1.5rem;
+            cursor: pointer;
+            background: none;
+            color: white;
+            padding: 0;
         }
 
-        /* Trạng thái lật */
-        .atm-card.flipped {
-            transform: rotateY(180deg);
-        }
-
-        /* Hiệu ứng nâng nhẹ khi hover (chỉ khi chưa lật) */
-        .card-container:hover .atm-card:not(.flipped) {
-            transform: rotateY(5deg) rotateX(3deg);
-        }
-        .card-container:hover .atm-card.flipped {
-            transform: rotateY(175deg) rotateX(-3deg);
-        }
-
-        /* ===== MẶT TRƯỚC ===== */
-        .card-front {
+        .cart-count {
             position: absolute;
-            width: 100%;
-            height: 100%;
-            backface-visibility: hidden;
-            -webkit-backface-visibility: hidden;
-            border-radius: 20px;
-            background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
-            background-image:
-                radial-gradient(circle at 20% 30%, rgba(255, 255, 255, 0.08) 0%, transparent 40%),
-                linear-gradient(160deg, #2d3748 0%, #1a202c 70%, #0b0f19 100%);
-            padding: 28px 30px;
+            top: -8px;
+            right: -8px;
+            background-color: #ff6b6b;
+            color: white;
+            border-radius: 50%;
+            width: 20px;
+            height: 20px;
             display: flex;
-            flex-direction: column;
-            justify-content: space-between;
-            color: #e2e8f0;
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            box-shadow: 0 30px 50px rgba(0, 0, 0, 0.6), 0 10px 25px rgba(0, 0, 0, 0.5),
-                inset 0 1px 0 rgba(255, 255, 255, 0.1);
+            align-items: center;
+            justify-content: center;
+            font-size: 0.8rem;
+            font-weight: bold;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 2rem auto;
+            padding: 0 1rem;
+        }
+
+        /* ===== TRANG HIỂN THỊ SẢN PHẨM ===== */
+        #productPage {
+            display: block;
+        }
+
+        .page {
+            display: none;
+        }
+
+        .products-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 2rem;
+            margin-bottom: 2rem;
+        }
+
+        .product-card {
+            background: white;
+            border-radius: 10px;
             overflow: hidden;
-            z-index: 2;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            transition: all 0.3s ease;
         }
 
-        .card-front::before {
-            content: "";
-            position: absolute;
-            top: -50px;
-            right: -50px;
-            width: 280px;
-            height: 280px;
-            background: radial-gradient(circle, rgba(255, 215, 0, 0.15) 0%, transparent 70%);
-            border-radius: 50%;
-            z-index: 0;
+        .product-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 5px 20px rgba(0,0,0,0.15);
         }
 
-        .card-front::after {
-            content: "";
-            position: absolute;
-            bottom: -60px;
-            left: -40px;
-            width: 240px;
-            height: 240px;
-            background: radial-gradient(circle, rgba(59, 130, 246, 0.2) 0%, transparent 70%);
-            border-radius: 50%;
-            z-index: 0;
-        }
-
-        .card-header,
-        .card-body,
-        .card-footer {
-            position: relative;
-            z-index: 2;
-        }
-
-        .card-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-
-        .bank-logo {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-
-        .logo-icon {
-            width: 42px;
-            height: 42px;
-            background: linear-gradient(135deg, #fbbf24, #f59e0b);
-            border-radius: 12px;
+        .product-image {
+            width: 100%;
+            height: 200px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             display: flex;
             align-items: center;
             justify-content: center;
-            font-weight: 700;
-            font-size: 20px;
-            color: #0f172a;
-            box-shadow: 0 8px 15px rgba(251, 191, 36, 0.3);
+            color: white;
+            font-size: 3rem;
         }
 
-        .bank-name {
-            font-weight: 600;
-            font-size: 1.2rem;
-            letter-spacing: 0.5px;
-            color: #f1f5f9;
+        .product-info {
+            padding: 1.5rem;
         }
 
-        .card-type {
-            font-weight: 600;
+        .product-name {
+            font-size: 1.1rem;
+            font-weight: bold;
+            margin-bottom: 0.5rem;
+        }
+
+        .product-price {
+            color: #667eea;
+            font-size: 1.3rem;
+            font-weight: bold;
+            margin-bottom: 1rem;
+        }
+
+        .product-desc {
+            color: #777;
             font-size: 0.9rem;
-            background: rgba(255, 255, 255, 0.1);
-            backdrop-filter: blur(10px);
-            padding: 5px 14px;
-            border-radius: 30px;
-            color: #facc15;
-            letter-spacing: 0.8px;
-            border: 1px solid rgba(250, 204, 21, 0.3);
+            margin-bottom: 1rem;
         }
 
-        .chip-section {
+        .quantity-control {
             display: flex;
             align-items: center;
-            gap: 15px;
-            margin: 10px 0 5px;
+            gap: 0.5rem;
+            margin-bottom: 1rem;
         }
 
-        .chip {
+        .quantity-control input {
             width: 50px;
-            height: 38px;
-            background: linear-gradient(145deg, #d4af37, #b7932a);
-            border-radius: 8px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.5), inset 0 1px 2px rgba(255, 255, 200, 0.6);
-            position: relative;
+            padding: 0.5rem;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            text-align: center;
         }
 
-        .chip::after {
-            content: "";
-            width: 32px;
-            height: 24px;
-            background: repeating-linear-gradient(90deg,
-                    #a68b1c 0px, #a68b1c 3px,
-                    #e4c45a 3px, #e4c45a 6px);
+        .btn-add-cart {
+            width: 100%;
+            background-color: #667eea;
+            color: white;
+            padding: 0.8rem;
+            border-radius: 5px;
+            font-weight: bold;
+            cursor: pointer;
+            border: none;
+            transition: background-color 0.3s;
+        }
+
+        .btn-add-cart:hover {
+            background-color: #764ba2;
+        }
+
+        /* ===== TRANG GIỎ HÀNG ===== */
+        #cartPage {
+            background: white;
+            padding: 2rem;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+
+        .cart-empty {
+            text-align: center;
+            padding: 3rem;
+            color: #777;
+        }
+
+        .cart-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 2rem;
+        }
+
+        .cart-table th {
+            background-color: #f0f0f0;
+            padding: 1rem;
+            text-align: left;
+            font-weight: bold;
+            border-bottom: 2px solid #ddd;
+        }
+
+        .cart-table td {
+            padding: 1rem;
+            border-bottom: 1px solid #eee;
+        }
+
+        .cart-item-name {
+            font-weight: bold;
+        }
+
+        .cart-item-quantity {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .cart-item-quantity button {
+            width: 30px;
+            padding: 0;
+            background-color: #667eea;
+            color: white;
             border-radius: 3px;
         }
 
-        .contactless-icon {
-            font-size: 24px;
-            color: #94a3b8;
-            transform: rotate(90deg);
-            opacity: 0.8;
-        }
-
-        .card-number {
-            font-family: 'Courier New', 'Fira Code', monospace;
-            font-size: 1.9rem;
-            font-weight: 500;
-            letter-spacing: 4px;
-            word-spacing: 10px;
-            color: #f8fafc;
-            text-shadow: 0 2px 5px rgba(0, 0, 0, 0.5);
-            margin: 5px 0 2px;
-            display: flex;
-            justify-content: space-between;
-        }
-
-        .card-footer {
-            display: flex;
-            justify-content: space-between;
-            align-items: flex-end;
-            margin-top: 5px;
-        }
-
-        .holder-info {
-            display: flex;
-            flex-direction: column;
-        }
-
-        .label {
-            font-size: 0.65rem;
-            text-transform: uppercase;
-            letter-spacing: 1.5px;
-            color: #94a3b8;
-            font-weight: 500;
-        }
-
-        .value {
-            font-weight: 600;
-            font-size: 1.1rem;
-            letter-spacing: 0.6px;
-            color: #e2e8f0;
-            text-transform: uppercase;
-        }
-
-        .expiry-cvv {
-            display: flex;
-            gap: 25px;
-            align-items: flex-end;
-        }
-
-        .network-logo {
-            display: flex;
-            align-items: center;
-            gap: 5px;
-        }
-
-        .circle-red {
-            width: 28px;
-            height: 28px;
-            background: #ef4444;
-            border-radius: 50%;
-            opacity: 0.9;
-        }
-
-        .circle-yellow {
-            width: 28px;
-            height: 28px;
-            background: #f59e0b;
-            border-radius: 50%;
-            margin-left: -12px;
-            opacity: 0.9;
-        }
-
-        .network-text {
-            font-weight: 700;
-            font-size: 1.3rem;
-            letter-spacing: 1px;
-            margin-left: 5px;
-            color: #cbd5e1;
-        }
-
-        /* Ánh sáng quét */
-        .shine {
-            position: absolute;
-            top: 0;
-            left: -100%;
-            width: 60%;
-            height: 100%;
-            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.1), transparent);
-            transform: skewX(-20deg);
-            transition: left 1s ease;
-            z-index: 5;
-            pointer-events: none;
-        }
-
-        .card-container:hover .shine {
-            left: 130%;
-        }
-
-        /* ===== MẶT SAU ===== */
-        .card-back {
-            position: absolute;
-            width: 100%;
-            height: 100%;
-            backface-visibility: hidden;
-            -webkit-backface-visibility: hidden;
-            border-radius: 20px;
-            background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
-            background-image:
-                radial-gradient(circle at 70% 60%, rgba(255, 255, 255, 0.05) 0%, transparent 50%),
-                linear-gradient(160deg, #2d3748 0%, #1a202c 70%, #0b0f19 100%);
-            padding: 0;
-            display: flex;
-            flex-direction: column;
-            color: #e2e8f0;
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            box-shadow: 0 30px 50px rgba(0, 0, 0, 0.6), 0 10px 25px rgba(0, 0, 0, 0.5),
-                inset 0 1px 0 rgba(255, 255, 255, 0.1);
-            overflow: hidden;
-            transform: rotateY(180deg);
-            z-index: 1;
-        }
-
-        /* Dải từ đen */
-        .magnetic-stripe {
-            width: 100%;
-            height: 48px;
-            background: linear-gradient(180deg, #1a1a1a 0%, #0d0d0d 30%, #1f1f1f 60%, #0a0a0a 100%);
-            margin-top: 28px;
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.5);
-        }
-
-        .back-content {
-            padding: 20px 28px 20px;
-            display: flex;
-            flex-direction: column;
-            gap: 15px;
-            flex: 1;
-            position: relative;
-            z-index: 2;
-        }
-
-        /* Khu vực chữ ký */
-        .signature-section {
-            display: flex;
-            align-items: stretch;
-            gap: 0;
-            height: 40px;
-            margin-top: 5px;
-        }
-
-        .signature-label {
-            font-size: 0.6rem;
-            text-transform: uppercase;
-            letter-spacing: 1.2px;
-            color: #94a3b8;
-            font-weight: 500;
-            writing-mode: vertical-rl;
-            text-orientation: mixed;
-            background: rgba(255, 255, 255, 0.03);
-            padding: 4px 6px;
-            border-radius: 4px 0 0 4px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            border: 1px solid rgba(255, 255, 255, 0.08);
-            border-right: none;
-        }
-
-        .signature-strip {
-            flex: 1;
-            background: repeating-linear-gradient(-45deg,
-                    #e8e4d8 0px, #e8e4d8 2px,
-                    #f5f2e8 2px, #f5f2e8 4px);
-            border-radius: 0 4px 4px 0;
-            border: 1px solid rgba(180, 170, 150, 0.6);
-            position: relative;
-            overflow: hidden;
-        }
-
-        .signature-strip::after {
-            content: "Signature";
-            position: absolute;
-            right: 15px;
-            top: 50%;
-            transform: translateY(-50%);
-            font-family: 'Brush Script MT', 'Dancing Script', cursive;
-            font-size: 1.5rem;
-            color: rgba(80, 70, 60, 0.4);
-            letter-spacing: 2px;
-            pointer-events: none;
-        }
-
-        /* Dãy CVV */
-        .cvv-section {
-            display: flex;
-            align-items: center;
-            justify-content: flex-end;
-            gap: 12px;
-            margin-top: 2px;
-        }
-
-        .cvv-label {
-            font-size: 0.65rem;
-            text-transform: uppercase;
-            letter-spacing: 1.5px;
-            color: #94a3b8;
-            font-weight: 500;
-        }
-
-        .cvv-box {
-            background: #f8fafc;
-            color: #0f172a;
-            font-family: 'Courier New', monospace;
-            font-weight: 700;
-            font-size: 1.1rem;
-            letter-spacing: 3px;
-            padding: 8px 18px;
-            border-radius: 6px;
-            box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.2);
-            min-width: 80px;
+        .cart-item-quantity input {
+            width: 50px;
             text-align: center;
+            border: 1px solid #ddd;
+            padding: 0.3rem;
+            border-radius: 3px;
         }
 
-        /* Thông tin ngân hàng mặt sau */
-        .back-bank-info {
-            margin-top: auto;
-            font-size: 0.7rem;
-            color: #94a3b8;
-            line-height: 1.5;
-            letter-spacing: 0.3px;
-            border-top: 1px solid rgba(255, 255, 255, 0.08);
-            padding-top: 12px;
+        .btn-remove {
+            background-color: #ff6b6b;
+            color: white;
+            padding: 0.5rem 1rem;
+            border-radius: 5px;
+            cursor: pointer;
+            border: none;
         }
 
-        .back-bank-info strong {
-            color: #cbd5e1;
-            font-weight: 600;
+        .btn-remove:hover {
+            background-color: #ff5252;
         }
 
-        .back-network {
+        .cart-summary {
+            background-color: #f9f9f9;
+            padding: 2rem;
+            border-radius: 10px;
+            max-width: 400px;
+            margin-left: auto;
+        }
+
+        .summary-row {
             display: flex;
-            align-items: center;
-            gap: 6px;
-            margin-top: 6px;
+            justify-content: space-between;
+            margin-bottom: 0.8rem;
+            font-size: 0.95rem;
         }
 
-        .back-network .circle-red {
-            width: 22px;
-            height: 22px;
+        .summary-row.total {
+            border-top: 2px solid #ddd;
+            padding-top: 1rem;
+            font-size: 1.2rem;
+            font-weight: bold;
+            color: #667eea;
         }
-        .back-network .circle-yellow {
-            width: 22px;
-            height: 22px;
-            margin-left: -10px;
-        }
-        .back-network span {
-            font-weight: 700;
+
+        .btn-checkout {
+            width: 100%;
+            background-color: #667eea;
+            color: white;
+            padding: 1rem;
+            border-radius: 5px;
+            font-weight: bold;
+            cursor: pointer;
+            border: none;
+            margin-top: 1rem;
             font-size: 1rem;
-            letter-spacing: 1px;
-            color: #cbd5e1;
+            transition: background-color 0.3s;
         }
 
-        /* Nút gợi ý bên dưới */
-        .hint-text {
-            color: #9ca3af;
-            font-size: 0.9rem;
-            font-weight: 400;
-            letter-spacing: 0.4px;
-            text-align: center;
-            z-index: 2;
+        .btn-checkout:hover {
+            background-color: #764ba2;
+        }
+
+        .btn-continue-shopping {
+            width: 100%;
+            background-color: #ddd;
+            color: #333;
+            padding: 1rem;
+            border-radius: 5px;
+            font-weight: bold;
+            cursor: pointer;
+            border: none;
+            margin-top: 0.5rem;
+        }
+
+        /* ===== TRANG THANH TOÁN ===== */
+        #checkoutPage {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        .checkout-container {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 2rem;
+            margin-bottom: 2rem;
+        }
+
+        .checkout-section {
+            background: white;
+            padding: 2rem;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+
+        .section-title {
+            font-size: 1.3rem;
+            font-weight: bold;
+            margin-bottom: 1.5rem;
+            color: #667eea;
+        }
+
+        .form-group {
+            margin-bottom: 1rem;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: bold;
+            color: #333;
+        }
+
+        .form-group input,
+        .form-group select {
+            width: 100%;
+            padding: 0.8rem;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 0.95rem;
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+        }
+
+        .order-summary {
+            background-color: #f9f9f9;
+            padding: 1.5rem;
+            border-radius: 5px;
+            margin-bottom: 1rem;
+        }
+
+        .order-item {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 0.8rem;
+            padding-bottom: 0.8rem;
+            border-bottom: 1px solid #eee;
+        }
+
+        .order-item:last-child {
+            border-bottom: none;
+        }
+
+        .order-total {
+            display: flex;
+            justify-content: space-between;
+            font-size: 1.2rem;
+            font-weight: bold;
+            color: #667eea;
+            margin-top: 1rem;
+            padding-top: 1rem;
+            border-top: 2px solid #ddd;
+        }
+
+        .btn-pay {
+            width: 100%;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 1rem;
+            border-radius: 5px;
+            font-weight: bold;
+            cursor: pointer;
+            border: none;
+            font-size: 1rem;
+            transition: all 0.3s;
+        }
+
+        .btn-pay:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+
+        .payment-methods {
+            display: grid;
+            gap: 0.8rem;
+            margin-bottom: 1rem;
+        }
+
+        .payment-method {
             display: flex;
             align-items: center;
-            gap: 8px;
-            transition: color 0.3s;
+            padding: 1rem;
+            border: 2px solid #eee;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: all 0.3s;
         }
 
-        .hint-icon {
-            display: inline-block;
-            transition: transform 0.4s ease;
-            font-size: 1.1rem;
+        .payment-method:hover {
+            border-color: #667eea;
+            background-color: #f9f9f9;
         }
 
-        .card-container:hover~.hint-text .hint-icon,
-        .card-wrapper:hover .hint-text .hint-icon {
-            transform: rotateY(180deg);
+        .payment-method input[type="radio"] {
+            margin-right: 1rem;
+            cursor: pointer;
         }
 
-        /* Responsive */
-        @media (max-width: 480px) {
-            .card-container {
-                width: 100%;
-                height: 250px;
+        .success-page {
+            text-align: center;
+            padding: 3rem;
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+
+        .success-icon {
+            font-size: 4rem;
+            color: #51cf66;
+            margin-bottom: 1rem;
+        }
+
+        .success-message {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #51cf66;
+            margin-bottom: 1rem;
+        }
+
+        .success-order-id {
+            font-size: 0.9rem;
+            color: #777;
+            margin-bottom: 2rem;
+        }
+
+        .btn-back-home {
+            background-color: #667eea;
+            color: white;
+            padding: 1rem 2rem;
+        }
+
+        .btn-back-home:hover {
+            background-color: #764ba2;
+        }
+
+        @media (max-width: 768px) {
+            .checkout-container {
+                grid-template-columns: 1fr;
             }
-            .card-front {
-                padding: 20px 22px;
+
+            .products-grid {
+                grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
             }
-            .card-number {
-                font-size: 1.5rem;
-                letter-spacing: 3px;
+
+            .cart-table {
+                font-size: 0.9rem;
             }
-            .back-content {
-                padding: 12px 18px 14px;
-            }
-            .magnetic-stripe {
-                height: 40px;
-                margin-top: 22px;
-            }
-            .signature-section {
-                height: 34px;
-            }
-            .cvv-box {
-                padding: 6px 14px;
-                font-size: 1rem;
+
+            .cart-table td, .cart-table th {
+                padding: 0.7rem;
             }
         }
     </style>
 </head>
 <body>
-    <div class="background-glow"></div>
-    <div class="background-glow-2"></div>
-
-    <div class="card-wrapper">
-        <!-- Container thẻ -->
-        <div class="card-container" id="cardContainer" title="Nhấn để lật thẻ">
-            <div class="atm-card" id="atmCard">
-                <!-- ========== MẶT TRƯỚC ========== -->
-                <div class="card-front">
-                    <div class="shine"></div>
-
-                    <div class="card-header">
-                        <div class="bank-logo">
-                            <div class="logo-icon">V</div>
-                            <span class="bank-name">VIBANK</span>
-                        </div>
-                        <div class="card-type">PLATINUM</div>
-                    </div>
-
-                    <div class="card-body">
-                        <div class="chip-section">
-                            <div class="chip"></div>
-                            <span class="contactless-icon">📶</span>
-                        </div>
-                        <div class="card-number">
-                            <span>4856</span>
-                            <span>9210</span>
-                            <span>3782</span>
-                            <span>1045</span>
-                        </div>
-                    </div>
-
-                    <div class="card-footer">
-                        <div class="holder-info">
-                            <span class="label">Chủ thẻ</span>
-                            <span class="value">NGUYEN VAN A</span>
-                        </div>
-                        <div class="expiry-cvv">
-                            <div>
-                                <span class="label">Hiệu lực</span>
-                                <span class="value">12/28</span>
-                            </div>
-                        </div>
-                        <div class="network-logo">
-                            <div class="circle-red"></div>
-                            <div class="circle-yellow"></div>
-                            <span class="network-text">Mastercard</span>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- ========== MẶT SAU ========== -->
-                <div class="card-back">
-                    <!-- Dải từ tính -->
-                    <div class="magnetic-stripe"></div>
-
-                    <div class="back-content">
-                        <!-- Dòng chữ ký -->
-                        <div class="signature-section">
-                            <div class="signature-label">Ký</div>
-                            <div class="signature-strip"></div>
-                        </div>
-
-                        <!-- Mã CVV -->
-                        <div class="cvv-section">
-                            <span class="cvv-label">CVV</span>
-                            <div class="cvv-box">•••</div>
-                        </div>
-
-                        <!-- Thông tin ngân hàng -->
-                        <div class="back-bank-info">
-                            <strong>VIBANK</strong> - Ngân hàng TMCP Quốc Tế Việt Nam<br>
-                            Hotline: 1900 9999 88 • www.vibank.vn<br>
-                            Thẻ này thuộc quyền sở hữu của VIBANK.
-                            Nếu nhặt được, vui lòng trả lại ngân hàng gần nhất.
-                            <div class="back-network">
-                                <div class="circle-red"></div>
-                                <div class="circle-yellow"></div>
-                                <span>Mastercard</span>
-                            </div>
-                        </div>
-                    </div>
-                </div>
+    <header>
+        <div class="header-content">
+            <div class="logo">🛍️ ShopOnline</div>
+            <div class="nav-buttons">
+                <button class="btn-primary" onclick="showPage('productPage')">🏠 Trang Chủ</button>
+                <button class="cart-icon" onclick="showPage('cartPage')">
+                    🛒
+                    <span class="cart-count" id="cartCount">0</span>
+                </button>
             </div>
         </div>
+    </header>
 
-        <!-- Dòng gợi ý -->
-        <div class="hint-text">
-            <span class="hint-icon">👆</span> Nhấn vào thẻ để lật mặt sau
+    <div class="container">
+        <!-- TRANG HIỂN THỊ SẢN PHẨM -->
+        <div id="productPage" class="page">
+            <h1 style="margin-bottom: 2rem; color: #667eea;">🎁 Sản Phẩm Của Chúng Tôi</h1>
+            <div class="products-grid" id="productsGrid"></div>
+        </div>
+
+        <!-- TRANG GIỎ HÀNG -->
+        <div id="cartPage" class="page">
+            <h1 style="margin-bottom: 2rem; color: #667eea;">🛒 Giỏ Hàng</h1>
+            <div id="cartContent"></div>
+        </div>
+
+        <!-- TRANG THANH TOÁN -->
+        <div id="checkoutPage" class="page">
+            <h1 style="margin-bottom: 2rem; color: #667eea;">💳 Thanh Toán</h1>
+            <div id="checkoutContent"></div>
         </div>
     </div>
 
     <script>
-        (function() {
-            const cardContainer = document.getElementById('cardContainer');
-            const atmCard = document.getElementById('atmCard');
-            const hintText = document.querySelector('.hint-text');
+        // DỮ LIỆU SẢN PHẨM
+        const products = [
+            { id: 1, name: "Laptop Pro", price: 15000000, desc: "Laptop hiệu năng cao", emoji: "💻" },
+            { id: 2, name: "Điện Thoại X", price: 8000000, desc: "Điện thoại thông minh", emoji: "📱" },
+            { id: 3, name: "Tai Nghe Không Dây", price: 2000000, desc: "Âm thanh chất lượng cao", emoji: "🎧" },
+            { id: 4, name: "Đồng Hồ Thông Minh", price: 5000000, desc: "Đồng hồ kết nối", emoji: "⌚" },
+            { id: 5, name: "Camera 4K", price: 12000000, desc: "Quay phim chuyên nghiệp", emoji: "📷" },
+            { id: 6, name: "Máy Tính Bảng", price: 6000000, desc: "Thiết bị di động", emoji: "📱" },
+            { id: 7, name: "Bàn Phím Cơ", price: 3500000, desc: "Bàn phím gaming", emoji: "⌨️" },
+            { id: 8, name: "Chuột Gaming", price: 1500000, desc: "Chuột chính xác cao", emoji: "🖱️" }
+        ];
 
-            let isFlipped = false;
+        let cart = [];
+        let currentOrderData = {};
 
-            cardContainer.addEventListener('click', function(e) {
-                // Ngăn chặn click lan ra ngoài
-                e.stopPropagation();
+        // HIỂN THỊ SẢN PHẨM
+        function renderProducts() {
+            const grid = document.getElementById('productsGrid');
+            grid.innerHTML = products.map(product => `
+                <div class="product-card">
+                    <div class="product-image">${product.emoji}</div>
+                    <div class="product-info">
+                        <div class="product-name">${product.name}</div>
+                        <div class="product-price">${product.price.toLocaleString('vi-VN')} ₫</div>
+                        <div class="product-desc">${product.desc}</div>
+                        <div class="quantity-control">
+                            <label>Số lượng:</label>
+                            <input type="number" id="qty-${product.id}" value="1" min="1">
+                        </div>
+                        <button class="btn-add-cart" onclick="addToCart(${product.id})">
+                            Thêm vào giỏ
+                        </button>
+                    </div>
+                </div>
+            `).join('');
+        }
 
-                isFlipped = !isFlipped;
+        // THÊM VÀO GIỎ HÀNG
+        function addToCart(productId) {
+            const quantity = parseInt(document.getElementById(`qty-${productId}`).value);
+            const product = products.find(p => p.id === productId);
+            
+            const existingItem = cart.find(item => item.id === productId);
+            if (existingItem) {
+                existingItem.quantity += quantity;
+            } else {
+                cart.push({ ...product, quantity });
+            }
+            
+            updateCartCount();
+            alert(`✅ Đã thêm ${quantity} ${product.name} vào giỏ hàng!`);
+        }
 
-                if (isFlipped) {
-                    atmCard.classList.add('flipped');
-                    hintText.innerHTML =
-                        '<span class="hint-icon">👆</span> Nhấn vào thẻ để lật mặt trước';
+        // CẬP NHẬT SỐ LƯỢNG GIỎ HÀNG
+        function updateCartCount() {
+            const count = cart.reduce((sum, item) => sum + item.quantity, 0);
+            document.getElementById('cartCount').textContent = count;
+        }
+
+        // HIỂN THỊ GIỎ HÀNG
+        function renderCart() {
+            const cartContent = document.getElementById('cartContent');
+            
+            if (cart.length === 0) {
+                cartContent.innerHTML = `
+                    <div class="cart-empty">
+                        <div style="font-size: 3rem; margin-bottom: 1rem;">🛒</div>
+                        <p>Giỏ hàng của bạn trống</p>
+                        <button class="btn-primary" style="margin-top: 1rem;" onclick="showPage('productPage')">
+                            Tiếp tục mua sắm
+                        </button>
+                    </div>
+                `;
+                return;
+            }
+
+            const total = cart.reduce((sum, item) => sum + item.price * item.quantity, 0);
+            
+            cartContent.innerHTML = `
+                <table class="cart-table">
+                    <thead>
+                        <tr>
+                            <th>Sản Phẩm</th>
+                            <th>Giá</th>
+                            <th>Số Lượng</th>
+                            <th>Tổng</th>
+                            <th>Thao Tác</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        ${cart.map(item => `
+                            <tr>
+                                <td class="cart-item-name">${item.emoji} ${item.name}</td>
+                                <td>${item.price.toLocaleString('vi-VN')} ₫</td>
+                                <td class="cart-item-quantity">
+                                    <button onclick="updateQuantity(${item.id}, -1)">-</button>
+                                    <input type="number" value="${item.quantity}" onchange="changeQuantity(${item.id}, this.value)">
+                                    <button onclick="updateQuantity(${item.id}, 1)">+</button>
+                                </td>
+                                <td>${(item.price * item.quantity).toLocaleString('vi-VN')} ₫</td>
+                                <td><button class="btn-remove" onclick="removeFromCart(${item.id})">Xóa</button></td>
+                            </tr>
+                        `).join('')}
+                    </tbody>
+                </table>
+                
+                <div class="cart-summary">
+                    <div class="summary-row">
+                        <span>Tạm tính:</span>
+                        <span>${total.toLocaleString('vi-VN')} ₫</span>
+                    </div>
+                    <div class="summary-row">
+                        <span>Phí vận chuyển:</span>
+                        <span>Miễn phí</span>
+                    </div>
+                    <div class="summary-row total">
+                        <span>Tổng cộng:</span>
+                        <span>${total.toLocaleString('vi-VN')} ₫</span>
+                    </div>
+                    <button class="btn-checkout" onclick="goToCheckout()">Tiến hành thanh toán</button>
+                    <button class="btn-continue-shopping" onclick="showPage('productPage')">Tiếp tục mua sắm</button>
+                </div>
+            `;
+        }
+
+        // CẬP NHẬT SỐ LƯỢNG SẢN PHẨM
+        function updateQuantity(productId, change) {
+            const item = cart.find(p => p.id === productId);
+            if (item) {
+                item.quantity += change;
+                if (item.quantity <= 0) {
+                    removeFromCart(productId);
                 } else {
-                    atmCard.classList.remove('flipped');
-                    hintText.innerHTML =
-                        '<span class="hint-icon">👆</span> Nhấn vào thẻ để lật mặt sau';
+                    updateCartCount();
+                    renderCart();
                 }
-            });
+            }
+        }
 
-            // Hỗ trợ touch trên mobile
-            cardContainer.addEventListener('touchstart', function(e) {
-                // Không preventDefault để vẫn giữ scroll nếu cần
-                // Chỉ đánh dấu để tránh double-fire với click
-            }, { passive: true });
-        })();
+        // THAY ĐỔI SỐ LƯỢNG TRỰC TIẾP
+        function changeQuantity(productId, value) {
+            const qty = parseInt(value);
+            const item = cart.find(p => p.id === productId);
+            if (item && qty > 0) {
+                item.quantity = qty;
+                updateCartCount();
+                renderCart();
+            }
+        }
+
+        // XÓA KHỎI GIỎ HÀNG
+        function removeFromCart(productId) {
+            cart = cart.filter(item => item.id !== productId);
+            updateCartCount();
+            renderCart();
+        }
+
+        // ĐI TỚI TRANG THANH TOÁN
+        function goToCheckout() {
+            if (cart.length === 0) {
+                alert('Giỏ hàng trống!');
+                return;
+            }
+            renderCheckout();
+            showPage('checkoutPage');
+        }
+
+        // HIỂN THỊ TRANG THANH TOÁN
+        function renderCheckout() {
+            const total = cart.reduce((sum, item) => sum + item.price * item.quantity, 0);
+            const shippingFee = 0;
+            const totalAmount = total + shippingFee;
+
+            const checkoutContent = document.getElementById('checkoutContent');
+            checkoutContent.innerHTML = `
+                <div class="checkout-container">
+                    <!-- THÔNG TIN ĐẶT HÀNG -->
+                    <div class="checkout-section">
+                        <div class="section-title">📋 Thông Tin Khách Hàng</div>
+                        
+                        <div class="form-group">
+                            <label>Họ và Tên *</label>
+                            <input type="text" id="fullName" placeholder="Nhập họ và tên">
+                        </div>
+
+                        <div class="form-group">
+                            <label>Email *</label>
+                            <input type="email" id="email" placeholder="Nhập email">
+                        </div>
+
+                        <div class="form-group">
+                            <label>Số Điện Thoại *</label>
+                            <input type="tel" id="phone" placeholder="Nhập số điện thoại">
+                        </div>
+
+                        <div class="section-title" style="margin-top: 2rem;">📍 Địa Chỉ Giao Hàng</div>
+
+                        <div class="form-group">
+                            <label>Địa Chỉ *</label>
+                            <input type="text" id="address" placeholder="Nhập địa chỉ">
+                        </div>
+
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label>Phường/Xã *</label>
+                                <input type="text" id="ward" placeholder="Phường/Xã">
+                            </div>
+                            <div class="form-group">
+                                <label>Quận/Huyện *</label>
+                                <input type="text" id="district" placeholder="Quận/Huyện">
+                            </div>
+                        </div>
+
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label>Thành Phố *</label>
+                                <input type="text" id="city" placeholder="Thành phố">
+                            </div>
+                            <div class="form-group">
+                                <label>Mã Bưu Chính</label>
+                                <input type="text" id="zipcode" placeholder="Mã bưu chính">
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- THANH TOÁN -->
+                    <div class="checkout-section">
+                        <div class="section-title">💳 Thanh Toán</div>
+
+                        <div class="order-summary">
+                            ${cart.map(item => `
+                                <div class="order-item">
+                                    <span>${item.emoji} ${item.name} x${item.quantity}</span>
+                                    <span>${(item.price * item.quantity).toLocaleString('vi-VN')} ₫</span>
+                                </div>
+                            `).join('')}
+                            <div class="order-total">
+                                <span>Tổng Cộng:</span>
+                                <span>${totalAmount.toLocaleString('vi-VN')} ₫</span>
+                            </div>
+                        </div>
+
+                        <div class="section-title">💰 Hình Thức Thanh Toán</div>
+
+                        <div class="payment-methods">
+                            <label class="payment-method">
+                                <input type="radio" name="payment" value="cod" checked>
+                                <span>💵 Thanh toán khi nhận hàng (COD)</span>
+                            </label>
+                            <label class="payment-method">
+                                <input type="radio" name="payment" value="bank">
+                                <span>🏦 Chuyển khoản ngân hàng</span>
+                            </label>
+                            <label class="payment-method">
+                                <input type="radio" name="payment" value="card">
+                                <span>💳 Thẻ tín dụng/Debit</span>
+                            </label>
+                            <label class="payment-method">
+                                <input type="radio" name="payment" value="wallet">
+                                <span>📱 Ví điện tử</span>
+                            </label>
+                        </div>
+
+                        <button class="btn-pay" onclick="processPayment()">Đặt Hàng</button>
+                        <button class="btn-continue-shopping" onclick="showPage('cartPage')">Quay lại giỏ hàng</button>
+                    </div>
+                </div>
+            `;
+        }
+
+        // XỬ LÝ THANH TOÁN
+        function processPayment() {
+            const fullName = document.getElementById('fullName').value.trim();
+            const email = document.getElementById('email').value.trim();
+            const phone = document.getElementById('phone').value.trim();
+            const address = document.getElementById('address').value.trim();
+            const ward = document.getElementById('ward').value.trim();
+            const district = document.getElementById('district').value.trim();
+            const city = document.getElementById('city').value.trim();
+
+            if (!fullName || !email || !phone || !address || !ward || !district || !city) {
+                alert('⚠️ Vui lòng điền đầy đủ thông tin!');
+                return;
+            }
+
+            if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+                alert('⚠️ Email không hợp lệ!');
+                return;
+            }
+
+            if (!/^[0-9]{10,11}$/.test(phone)) {
+                alert('⚠️ Số điện thoại phải có 10-11 chữ số!');
+                return;
+            }
+
+            currentOrderData = {
+                fullName, email, phone, address, ward, district, city,
+                items: cart,
+                total: cart.reduce((sum, item) => sum + item.price * item.quantity, 0),
+                orderDate: new Date().toLocaleString('vi-VN')
+            };
+
+            showSuccessPage();
+        }
+
+        // HIỂN THỊ TRANG THÀNH CÔNG
+        function showSuccessPage() {
+            const checkoutContent = document.getElementById('checkoutContent');
+            const orderId = 'DH' + Date.now();
+
+            checkoutContent.innerHTML = `
+                <div class="success-page">
+                    <div class="success-icon">✅</div>
+                    <div class="success-message">Đặt hàng thành công!</div>
+                    <div class="success-order-id">
+                        Mã đơn hàng: <strong>${orderId}</strong><br>
+                        Thời gian: ${currentOrderData.orderDate}
+                    </div>
+
+                    <div style="background-color: #f0f0f0; padding: 1.5rem; border-radius: 5px; text-align: left; margin-bottom: 2rem;">
+                        <p style="margin-bottom: 1rem;"><strong>👤 Thông tin khách hàng:</strong></p>
+                        <p>Họ tên: ${currentOrderData.fullName}</p>
+                        <p>Email: ${currentOrderData.email}</p>
+                        <p>Điện thoại: ${currentOrderData.phone}</p>
+                        <p style="margin-top: 1rem; margin-bottom: 1rem;"><strong>📦 Giao đến:</strong></p>
+                        <p>${currentOrderData.address}, ${currentOrderData.ward}, ${currentOrderData.district}, ${currentOrderData.city}</p>
+                        <p style="margin-top: 1rem; margin-bottom: 1rem;"><strong>💰 Tổng tiền:</strong></p>
+                        <p style="font-size: 1.2rem; color: #667eea; font-weight: bold;">
+                            ${currentOrderData.total.toLocaleString('vi-VN')} ₫
+                        </p>
+                    </div>
+
+                    <p style="color: #777; margin-bottom: 1rem;">
+                        ✉️ Chúng tôi sẽ gửi xác nhận đơn hàng qua email ${currentOrderData.email}
+                    </p>
+
+                    <button class="btn-back-home" onclick="resetAndHome()">🏠 Quay về Trang Chủ</button>
+                </div>
+            `;
+        }
+
+        // RESET VÀ QUAY VỀ TRANG CHỦ
+        function resetAndHome() {
+            cart = [];
+            updateCartCount();
+            renderProducts();
+            showPage('productPage');
+        }
+
+        // CHUYỂN ĐỔI TRANG
+        function showPage(pageId) {
+            document.querySelectorAll('.page').forEach(page => page.style.display = 'none');
+            document.getElementById(pageId).style.display = 'block';
+
+            if (pageId === 'productPage') renderProducts();
+            else if (pageId === 'cartPage') renderCart();
+            
+            window.scrollTo(0, 0);
+        }
+
+        // KHỞI ĐỘNG
+        window.onload = () => {
+            renderProducts();
+            showPage('productPage');
+        };
     </script>
 </body>
 </html>
-
